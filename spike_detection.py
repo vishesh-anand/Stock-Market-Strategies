@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from scrap_stocks import real_time_price
 from interpolate import interpolate_data
 import webbrowser
+from popup_notification import send_notification_alert
 
 SPIKE_HEIGHT=3
 
@@ -35,9 +36,15 @@ def calc_percentage_change(df,local_datetime):
 	percentage_change=((now_data-minimum_data)/minimum_data)*100
 	return percentage_change
 
+def generate_message(spiked_up_stocks):
+	message=''
+	size=spiked_up_stocks.shape[0]
+	for i in range(size):
+		message = message + spiked_up_stocks.index[i] + 'has spurted by' + str(spiked_up_stocks.values[i]) + '\n'
+	return message
 
-# f=open(filename1,"w+")
-# f.close()
+f=open(filename1,"w+")
+f.close()
 try:
 	DF=pd.read_csv(filename1,index_col=0)
 	d=DF.to_dict('list')
@@ -68,4 +75,5 @@ while True:
 	if not(spiked_up_stocks.empty):
 		print("Spiked up stocks - ")
 		print(spiked_up_stocks)
+		send_notification_alert("Spike detected!!", generate_message(spiked_up_stocks))
 	time.sleep(3)
