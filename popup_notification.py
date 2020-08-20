@@ -1,30 +1,53 @@
 #!/usr/bin/env python
-import webbrowser
-from tkinter import *
-from tkinter import messagebox, ttk
+#import webbrowser
+#from tkinter import *
+#from tkinter import messagebox, ttk
+from playsound import playsound
+import os
+import platform
 
+def send_notification_alert(TITLE,SUBTITLE):
 
+	if platform.system()=='Darwin':
+		from pync import Notifier
+	
+		Notifier.notify(message='Click here to trade now', 
+					title=TITLE, 
+					subtitle= SUBTITLE, 
+					open='http://www.icicidirect.com',
+					sound='default'
+					)					
+		playsound('/Users/anandgupta/Desktop/Stock_Market/swiftly.mp3')
 
-def open_webpage():
-	webbrowser.open('http://www.icicidirect.com', new=2)
+	elif platform.system()=='Windows':
+		from plyer import notification
 
-def call_me():
-	messagebox.showinfo("Success", "Installation completed")
+		notification.notify(
+							title=TITLE,
+							message = SUBTITLE + '\nClick here to trade now!!',
+							timeout=10
+							)
+		playsound('/Users/anandgupta/Desktop/Stock_Market/swiftly.mp3')
 
-root= Tk()
-root.title("Spike Detected!")
+	else:
+		print("Platform not supported")
 
-style=ttk.Style()
-style.configure("TButton", foreground="white", background="blue")
+# def open_webpage():
+# 	webbrowser.open('http://www.icicidirect.com', new=2)
 
-b=ttk.Button(root, text="Click here to redirect to ICICIDirect", command=open_webpage)
-b.pack()
+# def call_me():
+# 	messagebox.showinfo("Success", "Installation completed")
 
-root.geometry('400x400')
-root.mainloop()
-# import notify2
+# root= Tk()
+# root.title("Spike Detected!")
 
-# notify2.init('Alert')
+# style=ttk.Style()
+# style.configure("TButton", foreground="white", background="blue")
 
-# n=notify2.Notification(summary="Time to take rest", message="Relax your eyes now")
-# n.show()
+# b=ttk.Button(root, text="Click here to redirect to ICICIDirect", command=open_webpage)
+# b.pack()
+
+# playsound('/Users/anandgupta/Desktop/Stock_Market/swiftly.mp3')
+
+# root.geometry('400x400')
+# root.mainloop()
