@@ -14,4 +14,3 @@ def interpolate_data(filename1,filename2):
 	interpolated_data = upsampled.interpolate(method='linear')
 	interpolated_data.to_csv(filename2,mode='w')
 	return interpolate_data
-
