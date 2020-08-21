@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import time
 import random
@@ -21,23 +21,32 @@ def get_openclosedata(stock_code):
 def real_time_price(stock_code):
 	url=('https://in.finance.yahoo.com/quote/'+stock_code + '?p=' + stock_code + '&.tsrc=fin-tre-srch')
 	# response = requests.get(url)
-	response = ''
-	while response=='':
+	
+	while True:
+		response = ''
+		while response=='':
+			try:
+				response = requests.get(url)
+				break
+			except:
+				print("Connection refused by server...")
+				print("Trying again in 3 seconds")
+				time.sleep(3)
+				continue
 		try:
-			response = requests.get(url)
+			web_content = BeautifulSoup(response.text,'lxml')
+			web_content = web_content.find('div',{'class' : 'My(6px) Pos(r) smartphone_Mt(6px)'})
+			web_content = web_content.find('span').text
 			break
 		except:
-			print("Connection refused by server...")
-			print("Let me sleep for 3 seconds")
+			print("Faulty data received... Trying again in 3 seconds")
 			time.sleep(3)
 			continue
 
-	web_content = BeautifulSoup(response.text,'lxml')
-	web_content = web_content.find('div',{'class' : 'My(6px) Pos(r) smartphone_Mt(6px)'})
-	web_content = web_content.find('span').text
+	
 
-	if web_content==[]:
-		web_content='99999'
+	# if web_content==[]:
+	# 	web_content='99999'
 	web_content=web_content.replace(',','')
 
 	return float(web_content)

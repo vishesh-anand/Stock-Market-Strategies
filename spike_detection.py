@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import time
 import requests
@@ -43,8 +43,8 @@ def generate_message(spiked_up_stocks):
 		message = message + spiked_up_stocks.index[i] + 'has spurted by' + str(spiked_up_stocks.values[i]) + '\n'
 	return message
 
-f=open(filename1,"w+")
-f.close()
+# f=open(filename1,"w+")
+# f.close()
 try:
 	DF=pd.read_csv(filename1,index_col=0)
 	d=DF.to_dict('list')
