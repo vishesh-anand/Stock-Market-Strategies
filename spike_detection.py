@@ -31,16 +31,25 @@ def get_past_data(local_datetime,MINUTES=10):
 def calc_percentage_change(df,local_datetime):
 
 	minimum_data=df.min()
+	maximum_data=df.max()
+
 	now=local_datetime.strftime('%Y-%m-%d %H:%M:%S')
 	now_data=df.loc[now]
-	percentage_change=((now_data-minimum_data)/minimum_data)*100
-	return percentage_change
 
-def generate_message(spiked_up_stocks):
+	pchange={}
+	percentage_increment=((now_data-minimum_data)/minimum_data)*100
+	percentage_decrement=((now_data-maximum_data)/maximum_data)*100
+
+	pchange['Increment']=percentage_increment
+	pchange['Decrement']=percentage_decrement
+
+	return pchange
+
+def generate_message(spiked_up_stocks,up_or_down):
 	message=''
 	size=spiked_up_stocks.shape[0]
 	for i in range(size):
-		message = message + spiked_up_stocks.index[i] + 'has spurted by' + str(spiked_up_stocks.values[i]) + '\n'
+		message = message + spiked_up_stocks.index[i] + 'has spurted' + up_or_down + 'by' + str(spiked_up_stocks.values[i]) + '\n'
 	return message
 
 # f=open(filename1,"w+")
@@ -63,17 +72,24 @@ while True:
 	print("PARSING DATA at "+local_datetime)
 	df=pd.DataFrame(data=d)
 	df.to_csv(filename1, mode= 'w', header=True)
-	# print(df)
 
 	interpolate_data(filename1,filename2)
 	df1=get_past_data(temp_local_datetime,MINUTES=10)
-	percentage_change=calc_percentage_change(df1,temp_local_datetime)
-
+	pchange=calc_percentage_change(df1,temp_local_datetime)
 	# print(percentage_change)
-	condition=percentage_change>SPIKE_HEIGHT
-	spiked_up_stocks=percentage_change[condition]
+	su_condition=pchange['Increment']>SPIKE_HEIGHT
+	sd_condition=pchange['Decrement']<(-SPIKE_HEIGHT)
+
+	spiked_up_stocks=(pchange['Increment'])[su_condition]
+	spiked_down_stocks=(pchange['Decrement'])[sd_condition]
+
 	if not(spiked_up_stocks.empty):
 		print("Spiked up stocks - ")
 		print(spiked_up_stocks)
-		send_notification_alert("Spike detected!!", generate_message(spiked_up_stocks))
+		send_notification_alert("Spike detected!!", generate_message(spiked_up_stocks,"up"))
+	if not(spiked_down_stocks.empty):
+		print("Spiked down stocks - ")
+		print(spiked_down_stocks)
+		send_notification_alert("Spike detected!!", generate_message(spiked_down_stocks,"down"))
+
 	time.sleep(3)
